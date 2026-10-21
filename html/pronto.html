@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto EduCore IFPR - Ecossistema Acadêmico Unificado</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ifpr: {
+                            dark: '#006633',
+                            green: '#0b8a4f',
+                            light: '#e6f4ed',
+                            accent: '#10b981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .glass-header { backdrop-filter: blur(12px); background-color: rgba(255, 255, 255, 0.92); }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col bg-slate-50 antialiased selection:bg-ifpr-green selection:text-white">
+
+    <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- ==================== AUTH MODAL ==================== -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 sm:p-8 relative transition-all transform scale-100">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-ifpr-dark text-white flex items-center justify-center font-bold text-xl shadow-md">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">EduCore IFPR</h3>
+                    <p class="text-xs text-slate-500">Acesso Unificado à Plataforma</p>
+                </div>
+            </div>
+
+            <!-- Modal Nav Tabs -->
+            <div class="flex border-b border-slate-200 mb-6">
+                <button id="tab-login-btn" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-sm font-semibold text-ifpr-dark border-b-2 border-ifpr-dark transition-all">Entrar</button>
+                <button id="tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-all">Cadastrar</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">E-mail Institucional</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-5 h-5 absolute left-3 top-3 text-slate-400"></i>
+                        <input type="email" id="login-email" required placeholder="usuario@ifpr.edu.br" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Senha</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-5 h-5 absolute left-3 top-3 text-slate-400"></i>
+                        <input type="password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl shadow-lg shadow-ifpr-dark/20 transition flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Entrar na Conta
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo</label>
+                    <input type="text" required placeholder="Seu Nome" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">E-mail Institucional (@ifpr.edu.br)</label>
+                    <input type="email" id="reg-email" required placeholder="nome@ifpr.edu.br" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Perfil de Usuário</label>
+                    <select id="reg-role" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                        <option value="student">Aluno / Discente</option>
+                        <option value="teacher">Professor / Docente</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Senha</label>
+                    <input type="password" required placeholder="Mínimo 8 caracteres" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-ifpr-green focus:border-ifpr-green text-sm outline-none transition">
+                </div>
+                <button type="submit" class="w-full py-3 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl shadow-lg transition text-sm">
+                    Criar Conta Institucional
+                </button>
+            </form>
+
+            <!-- Demo Quick Login Buttons -->
+            <div class="mt-6 pt-6 border-t border-slate-200">
+                <p class="text-xs text-center font-medium text-slate-500 mb-3">Acesso Rápido para Avaliação (Demo):</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="loginAsDemo('student')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="user" class="w-3.5 h-3.5"></i> Aluno Demo
+                    </button>
+                    <button onclick="loginAsDemo('teacher')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="award" class="w-3.5 h-3.5"></i> Professor Demo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PUBLIC LANDING PAGE ==================== -->
+    <div id="public-landing-page" class="flex-1 flex flex-col">
+        <!-- Public Header -->
+        <header class="sticky top-0 z-40 glass-header border-b border-slate-200/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-ifpr-dark text-white flex items-center justify-center font-bold shadow-md shadow-ifpr-dark/20">
+                        <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-xl tracking-tight text-slate-900 block leading-none">EduCore <span class="text-ifpr-green">IFPR</span></span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Projeto Institucional</span>
+                    </div>
+                </div>
+
+                <!-- Nav Links -->
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
+                    <a href="#projeto" class="hover:text-ifpr-dark transition">O Projeto</a>
+                    <a href="#problema-solucao" class="hover:text-ifpr-dark transition">Problema & Solução</a>
+                    <a href="#funcionalidades" class="hover:text-ifpr-dark transition">Funcionalidades</a>
+                    <a href="#cronograma" class="hover:text-ifpr-dark transition">Cronograma</a>
+                    <a href="#roi" class="hover:text-ifpr-dark transition">ROI & Métricas</a>
+                </nav>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-ifpr-dark transition">
+                        Entrar
+                    </button>
+                    <button onclick="openAuthModal('register')" class="px-4 py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white text-sm font-semibold rounded-xl shadow-md shadow-ifpr-dark/20 transition flex items-center gap-2">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Cadastrar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section id="projeto" class="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white py-24 lg:py-32">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-ifpr-green/20 border border-ifpr-green/40 text-emerald-300 text-xs font-semibold tracking-wide uppercase">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i> Plataforma Acadêmica Unificada
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                            O Ecossistema Acadêmico Unificado do <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-ifpr-green">IFPR</span>
+                        </h1>
+                        <p class="text-slate-300 text-lg sm:text-xl leading-relaxed max-w-2xl font-normal">
+                            Centralize disciplinas, envio de atividades, materiais didáticos, fóruns de discussão e comunicação em uma única experiência moderna e acessível.
+                        </p>
+                        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <button onclick="openAuthModal('login')" class="w-full sm:w-auto px-8 py-4 bg-ifpr-green hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-ifpr-green/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+                                <i data-lucide="arrow-right-circle" class="w-5 h-5"></i> Acessar Plataforma Demo
+                            </button>
+                            <a href="#funcionalidades" class="w-full sm:w-auto px-8 py-4 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold rounded-2xl transition flex items-center justify-center gap-2">
+                                <i data-lucide="layers" class="w-5 h-5"></i> Ver Funcionalidades
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hero Visual Card -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-slate-800/90 border border-slate-700/80 rounded-3xl p-6 shadow-2xl backdrop-blur-sm space-y-4">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <span class="text-xs font-mono text-slate-400">educore.ifpr.edu.br</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-white">Algoritmos e Estrutura de Dados</p>
+                                            <p class="text-[10px] text-slate-400">TADS • Campus Assis Chateaubriand</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium">Ativo</span>
+                                </div>
+                                <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                                            <i data-lucide="file-check" class="w-4 h-4"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-white">Entrega de Trabalho Prático II</p>
+                                            <p class="text-[10px] text-slate-400">Prazo: Hoje, 23:59</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-medium">Pendente</span>
+                                </div>
+                            </div>
+                            <div class="pt-2 grid grid-cols-3 gap-2 text-center">
+                                <div class="p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/30">
+                                    <p class="text-lg font-bold text-emerald-400">100%</p>
+                                    <p class="text-[10px] text-slate-400">Integrado IFPR</p>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/30">
+                                    <p class="text-lg font-bold text-white">&lt; 1s</p>
+                                    <p class="text-[10px] text-slate-400">Sincronia</p>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-slate-900/50 border border-slate-700/30">
+                                    <p class="text-lg font-bold text-emerald-400">24/7</p>
+                                    <p class="text-[10px] text-slate-400">Acessibilidade</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem vs Solution Section -->
+        <section id="problema-solucao" class="py-20 bg-slate-50 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-ifpr-green mb-2">Transformação Digital</h2>
+                    <h3 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">Do Cenário Fragmentado à Excelência</h3>
+                    <p class="text-slate-600 mt-3">Comparativo entre a rotina acadêmica pulverizada e a solução unificada EduCore.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Current Problem Card -->
+                    <div class="bg-white rounded-3xl p-8 border border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-slate-900">Cenário Atual (Fragmentado)</h4>
+                                <p class="text-xs text-slate-500">Comunicação e materiais dispersos</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500 shrink-0 mt-0.5"></i>
+                                <span>Avisos importantes perdidos em grupos de WhatsApp não oficiais e e-mails pessoais.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500 shrink-0 mt-0.5"></i>
+                                <span>Links de Google Drive quebrados e materiais de aula espalhados sem padronização.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500 shrink-0 mt-0.5"></i>
+                                <span>Dificuldade no acompanhamento de prazos de entregas e ausência de histórico central.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="x-circle" class="w-5 h-5 text-red-500 shrink-0 mt-0.5"></i>
+                                <span>Sobrecarga do corpo docente no gerenciamento de múltiplos canais.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- EduCore Solution Card -->
+                    <div class="bg-white rounded-3xl p-8 border border-emerald-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-ifpr-green"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-ifpr-green flex items-center justify-center font-bold">
+                                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-slate-900">Solução EduCore IFPR</h4>
+                                <p class="text-xs text-slate-500">Ecossistema único e auditável</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="check" class="w-5 h-5 text-ifpr-green shrink-0 mt-0.5"></i>
+                                <span>Painel centralizado com autenticação oficial via e-mail institucional @ifpr.edu.br.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="check" class="w-5 h-5 text-ifpr-green shrink-0 mt-0.5"></i>
+                                <span>Biblioteca digital por disciplina com filtros por tipo de arquivo e fácil download.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="check" class="w-5 h-5 text-ifpr-green shrink-0 mt-0.5"></i>
+                                <span>Gestão completa de trabalhos, envio de arquivos e correção com feedback em tempo real.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm text-slate-600">
+                                <i data-lucide="check" class="w-5 h-5 text-ifpr-green shrink-0 mt-0.5"></i>
+                                <span>Fóruns acadêmicos e mural de avisos diretamente vinculados às turmas.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 Essential Features Grid Section -->
+        <section id="funcionalidades" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-ifpr-green mb-2">Recursos Integrados</h2>
+                    <h3 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">As 10 Funcionalidades Essenciais</h3>
+                    <p class="text-slate-600 mt-3">Arquitetura concebida para atender discentes, docentes e gestão acadêmica.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">1. Autenticação IFPR</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Validação estrita do domínio @ifpr.edu.br e separação automática de perfis Aluno e Professor.</p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">2. Dashboard Personalizado</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Visão contextual adaptada ao papel do usuário com métricas, contadores de prazos e comunicados.</p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">3. Gestão de Disciplinas</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Organização em hubs contendo conteúdos, atividades, fórum de dúvidas e notas das aulas.</p>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="folder-git-2" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">4. Biblioteca Digital</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Repositório de slides, apostilas e exercícios com filtros por formato e funcionalidade de download.</p>
+                    </div>
+                    <!-- Card 5 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="file-check" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">5. Sistema de Atividades</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Envio digital com simulação de anexos para alunos e painel de correção e feedback para professores.</p>
+                    </div>
+                    <!-- Card 6 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="messages-square" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">6. Fórum de Discussão</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Espaço dinâmico para dúvidas com sistema de curtidas, respostas encadeadas e moderação docente.</p>
+                    </div>
+                    <!-- Card 7 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="message-circle" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">7. Comentários da Aula</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Interação direta em tópicos específicos de aulas para esclarecimento pontual de conceitos.</p>
+                    </div>
+                    <!-- Card 8 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="search" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">8. Busca Inteligente</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Pesquisa global em materiais, disciplinas e discussões com filtragem instantânea.</p>
+                    </div>
+                    <!-- Card 9 -->
+                    <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-ifpr-green/40 hover:shadow-lg transition">
+                        <div class="w-12 h-12 rounded-xl bg-ifpr-dark text-white flex items-center justify-center mb-4">
+                            <i data-lucide="user-check" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">9. Perfil do Usuário</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Gestão de dados acadêmicos (Prontuário/SIAPE, Campus, Curso) e preferências do sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stakeholders & Structure -->
+        <section class="py-20 bg-slate-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-2">Estrutura Institucional</h2>
+                    <h3 class="text-3xl font-extrabold sm:text-4xl">Quem Participa do Ecossistema</h3>
+                    <p class="text-slate-400 mt-3">Perfis e papeis integrados na plataforma EduCore IFPR.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-center">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="user" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Alunos / Discentes</h4>
+                        <p class="text-xs text-slate-400 mt-2">Acesso a prazos, envio de atividades, materiais e participação em discussões.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-center">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Professores / Docentes</h4>
+                        <p class="text-xs text-slate-400 mt-2">Criação de tarefas, publicação de arquivos, avaliação com notas e moderação.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-center">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="sliders" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Coordenadores & Admins</h4>
+                        <p class="text-xs text-slate-400 mt-2">Supervisão de turmas, indicadores de adesão e relatórios analíticos de engajamento.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800 border border-slate-700 text-center">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="building-2" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Instituição IFPR</h4>
+                        <p class="text-xs text-slate-400 mt-2">Padronização da comunicação acadêmica e centralização de dados institucionais.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 24-Week Roadmap Timeline -->
+        <section id="cronograma" class="py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-ifpr-green mb-2">Planejamento Estratégico</h2>
+                    <h3 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">Cronograma do Projeto (24 Semanas)</h3>
+                    <p class="text-slate-600 mt-3">Metodologia ágil dividida em 6 fases de implementação gradual.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 1 - 4</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 1: Requisitos & UX Design</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Mapeamento de necessidades com alunos/professores, prototipagem de alta fidelidade e definição da arquitetura.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 5 - 8</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 2: Core Development & Auth</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Desenvolvimento da infraestrutura base, autenticação segura com e-mail institucional e controle de cargos.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 9 - 12</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 3: Módulos Acadêmicos</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Implementação das disciplinas, biblioteca digital, sistema de upload e repositório de conteúdos.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 13 - 16</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 4: Atividades & Fóruns</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Integração do fluxo de entregas de trabalhos, notas, comentários em tempo real e fórum de dúvidas.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 17 - 20</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 5: Teste Piloto em Campus</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Implantação piloto no Campus Assis Chateaubriand com coleta de feedback e ajustes de experiência.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-ifpr-green uppercase tracking-wider mb-1">Semanas 21 - 24</div>
+                        <h4 class="font-bold text-slate-900 text-base mb-2">Fase 6: Rollout Institucional</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Expansão para os demais campi do IFPR, capacitação do corpo docente e suporte contínuo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROI & Success Metrics -->
+        <section id="roi" class="py-20 bg-white border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-ifpr-green mb-2">Impacto Esperado</h2>
+                    <h3 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">ROI e Métricas de Sucesso</h3>
+                    <p class="text-slate-600 mt-3">Resultados mensuráveis projetados para a instituição.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center">
+                        <p class="text-4xl font-extrabold text-ifpr-dark">90%+</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-2">Taxa de Adoção</p>
+                        <p class="text-xs text-slate-500 mt-1">Estimada no primeiro semestre entre os alunos.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center">
+                        <p class="text-4xl font-extrabold text-ifpr-dark">-70%</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-2">Redução de E-mails</p>
+                        <p class="text-xs text-slate-500 mt-1">Menos ruído e dúvidas dispersas no e-mail.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center">
+                        <p class="text-4xl font-extrabold text-ifpr-dark">100%</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-2">Rastreabilidade</p>
+                        <p class="text-xs text-slate-500 mt-1">Histórico completo de entregas e prazos.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center">
+                        <p class="text-4xl font-extrabold text-ifpr-dark">0</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-2">Custo de Licença</p>
+                        <p class="text-xs text-slate-500 mt-1">Desenvolvido internamente com tecnologia aberta.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Public Footer -->
+        <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-ifpr-green text-white flex items-center justify-center font-bold">
+                            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-white font-bold tracking-tight text-lg">EduCore IFPR</span>
+                    </div>
+                    <p class="text-xs text-slate-500 text-center">
+                        &copy; 2026 Instituto Federal do Paraná - IFPR. Projeto de Inovação Tecnológica e Educacional.
+                    </p>
+                    <div class="flex items-center space-x-6 text-xs text-slate-400">
+                        <a href="#" class="hover:text-white transition">Privacidade</a>
+                        <a href="#" class="hover:text-white transition">Termos de Uso</a>
+                        <a href="#" class="hover:text-white transition">Suporte TI</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ==================== RESTRICTED PLATFORM (APP DASHBOARD) ==================== -->
+    <div id="restricted-platform" class="flex-1 flex flex-col md:flex-row hidden bg-slate-100 min-h-screen">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-ifpr-green text-white flex items-center justify-center font-bold shadow-md">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-base text-white block leading-none">EduCore</span>
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">IFPR Campus</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1 flex-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition bg-ifpr-dark text-white shadow-md">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </button>
+                <button onclick="switchTab('disciplines')" id="nav-disciplines" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Disciplinas
+                </button>
+                <button onclick="switchTab('library')" id="nav-library" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="folder-git-2" class="w-4 h-4"></i> Biblioteca Digital
+                </button>
+                <button onclick="switchTab('activities')" id="nav-activities" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="file-check" class="w-4 h-4"></i> Atividades
+                </button>
+                <button onclick="switchTab('forum')" id="nav-forum" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="messages-square" class="w-4 h-4"></i> Fórum Acadêmico
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="user" class="w-4 h-4"></i> Meu Perfil
+                </button>
+            </nav>
+
+            <!-- Role Badge / Switcher Banner inside Sidebar -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800 m-3 rounded-2xl">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-slate-400">Modo de Visão</span>
+                    <span id="role-badge-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400">
+                        Aluno
+                    </span>
+                </div>
+                <button onclick="toggleUserRole()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-700 transition">
+                    <i data-lucide="repeat" class="w-3.5 h-3.5"></i> Alternar p/ <span id="toggle-role-label">Professor</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- App Top Header Bar -->
+            <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 shadow-sm">
+                <!-- Search Bar -->
+                <div class="relative w-64 lg:w-96">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" placeholder="Buscar disciplinas, avisos ou arquivos..." class="w-full pl-9 pr-4 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-ifpr-green outline-none transition">
+                </div>
+
+                <!-- Right Controls (Notifications & User Avatar) -->
+                <div class="flex items-center gap-4">
+                    <!-- Notifications Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleNotificationsMenu()" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 relative transition">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="notif-badge" class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        </button>
+                        
+                        <!-- Notifications Popup -->
+                        <div id="notif-popup" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-3 z-50">
+                            <div class="px-4 pb-2 mb-2 border-b border-slate-100 flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-800">Notificações</span>
+                                <span class="text-[10px] text-ifpr-green font-semibold cursor-pointer" onclick="clearNotifs()">Limpar</span>
+                            </div>
+                            <div class="space-y-1 px-2 text-xs">
+                                <div class="p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer">
+                                    <p class="font-semibold text-slate-800">Nova atividade em Algoritmos</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Prazo de entrega em 3 dias.</p>
+                                </div>
+                                <div class="p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer">
+                                    <p class="font-semibold text-slate-800">Nota lançada: Eng. de Software</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Sua entrega recebeu avaliação 9.5.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-6 w-px bg-slate-200"></div>
+
+                    <!-- User Profile Quick Info -->
+                    <div class="flex items-center gap-3">
+                        <div id="user-avatar" class="w-9 h-9 rounded-xl bg-ifpr-dark text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            LS
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p id="user-name-display" class="text-xs font-bold text-slate-900 leading-none">Lucas Silva</p>
+                            <p id="user-role-display" class="text-[10px] text-slate-500 font-medium">Aluno • TADS IFPR</p>
+                        </div>
+                        <button onclick="handleLogout()" class="ml-2 p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition" title="Sair do Sistema">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Content Container -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
+                
+                <!-- TAB 1: DASHBOARD -->
+                <div id="tab-content-dashboard" class="space-y-6">
+                    <!-- Welcome Banner -->
+                    <div class="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-ifpr-dark text-white shadow-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+                                Ecossistema Ativo
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold mt-2">
+                                Bem-vindo(a), <span id="welcome-user-name">Lucas Silva</span>!
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                                Confira seu resumo de atividades, prazos e os principais avisos do Campus IFPR.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Stats Grid -->
+                    <div id="dashboard-stats-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Stat items rendered via JS based on Student/Teacher -->
+                    </div>
+
+                    <!-- Dashboard Core Section Grid -->
+                    <div class="grid lg:grid-cols-12 gap-6">
+                        <!-- Main Column -->
+                        <div class="lg:col-span-8 space-y-6">
+                            <!-- Contextual Card: Student Deliveries or Teacher Pending Grading -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 id="dash-section-title" class="font-bold text-slate-900 text-base">Próximas Entregas</h3>
+                                    <button onclick="switchTab('activities')" class="text-xs font-semibold text-ifpr-dark hover:underline">Ver todas</button>
+                                </div>
+                                <div id="dash-activities-list" class="space-y-3">
+                                    <!-- Dynamic List -->
+                                </div>
+                            </div>
+
+                            <!-- Recent Class Materials -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-slate-900 text-base">Materiais Recentes Liberados</h3>
+                                    <button onclick="switchTab('library')" class="text-xs font-semibold text-ifpr-dark hover:underline">Ir para Biblioteca</button>
+                                </div>
+                                <div id="dash-materials-list" class="space-y-3">
+                                    <!-- Dynamic Materials List -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Column -->
+                        <div class="lg:col-span-4 space-y-6">
+                            <!-- Campus Announcements -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <i data-lucide="megaphone" class="w-5 h-5 text-ifpr-green"></i>
+                                    <h3 class="font-bold text-slate-900 text-base">Avisos do Campus</h3>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                                        <span class="text-[10px] font-bold text-ifpr-dark uppercase">Secretaria • 20 Out</span>
+                                        <p class="font-bold text-xs text-slate-800 mt-0.5">Matrículas e Rematrículas 2027/1</p>
+                                        <p class="text-[11px] text-slate-500 mt-1">O período de atualização cadastral estará aberto a partir de 10 de Novembro.</p>
+                                    </div>
+                                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                                        <span class="text-[10px] font-bold text-amber-600 uppercase">TI Campus • 18 Out</span>
+                                        <p class="font-bold text-xs text-slate-800 mt-0.5">Manutenção Programada no SUAP</p>
+                                        <p class="text-[11px] text-slate-500 mt-1">Serviços passarão por melhorias no domingo das 02h às 06h.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: DISCIPLINES -->
+                <div id="tab-content-disciplines" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Disciplinas Cadastradas</h2>
+                            <p class="text-xs text-slate-500">Acesse as turmas ativas no semestre corrente do IFPR.</p>
+                        </div>
+                    </div>
+
+                    <!-- Disciplines Grid -->
+                    <div id="disciplines-grid" class="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                        <!-- Dynamic Disciplines List -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: DIGITAL LIBRARY -->
+                <div id="tab-content-library" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Biblioteca Digital</h2>
+                            <p class="text-xs text-slate-500">Apostilas, slides de aulas, listas de exercícios e arquivos das matérias.</p>
+                        </div>
+                        <div id="teacher-upload-btn-container" class="hidden">
+                            <button onclick="openUploadModal()" class="px-4 py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i data-lucide="upload" class="w-4 h-4"></i> Publicar Novo Material
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Filters -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterLibrary('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-ifpr-dark text-white">Todos</button>
+                        <button onclick="filterLibrary('slides')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Slides</button>
+                        <button onclick="filterLibrary('apostilas')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Apostilas</button>
+                        <button onclick="filterLibrary('exercicios')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Exercícios</button>
+                    </div>
+
+                    <!-- Files List -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div id="library-files-container" class="divide-y divide-slate-100">
+                            <!-- Rendered Files -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: ACTIVITIES SYSTEM -->
+                <div id="tab-content-activities" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Sistema de Atividades</h2>
+                            <p class="text-xs text-slate-500">Gerenciamento de entregas de trabalhos, notas e correções.</p>
+                        </div>
+                        <div id="teacher-create-act-container" class="hidden">
+                            <button onclick="openCreateActivityModal()" class="px-4 py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Criar Nova Atividade
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Student or Teacher Dynamic Activities Container -->
+                    <div id="activities-dynamic-view" class="space-y-4">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- TAB 5: ACADEMIC FORUM -->
+                <div id="tab-content-forum" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Fórum Acadêmico</h2>
+                            <p class="text-xs text-slate-500">Espaço colaborativo para tirar dúvidas e discutir matérias.</p>
+                        </div>
+                        <button onclick="openNewTopicModal()" class="px-4 py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <i data-lucide="message-square-plus" class="w-4 h-4"></i> Novo Tópico
+                        </button>
+                    </div>
+
+                    <!-- Topics Container -->
+                    <div id="forum-topics-container" class="space-y-4">
+                        <!-- Dynamic Topics -->
+                    </div>
+                </div>
+
+                <!-- TAB 6: PROFILE -->
+                <div id="tab-content-profile" class="space-y-6 hidden">
+                    <div class="bg-white rounded-3xl border border-slate-200/80 p-8 shadow-sm max-w-3xl mx-auto space-y-6">
+                        <div class="flex items-center gap-6">
+                            <div id="profile-avatar-big" class="w-20 h-20 rounded-2xl bg-ifpr-dark text-white text-2xl font-extrabold flex items-center justify-center shadow-lg">
+                                LS
+                            </div>
+                            <div>
+                                <h3 id="profile-fullname" class="text-2xl font-bold text-slate-900">Lucas Silva</h3>
+                                <p id="profile-code" class="text-xs text-ifpr-dark font-semibold">Prontuário: 2023101899</p>
+                                <p id="profile-campus" class="text-xs text-slate-500 mt-1">IFPR • Campus Assis Chateaubriand</p>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-6 grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500">E-mail Institucional</label>
+                                <p id="profile-email" class="text-sm font-bold text-slate-800 mt-0.5">lucas.silva@ifpr.edu.br</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500">Curso / Departamento</label>
+                                <p id="profile-dept" class="text-sm font-bold text-slate-800 mt-0.5">TADS - Tecnólogo em Análise e Dev. de Sistemas</p>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-6">
+                            <label class="block text-xs font-semibold text-slate-500 mb-2">Biografia Acadêmica</label>
+                            <textarea id="profile-bio" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-ifpr-green outline-none" placeholder="Escreva uma breve apresentação...">Estudante do 4º Período de TADS no IFPR. Interesse em Engenharia de Software e Banco de Dados.</textarea>
+                            <button onclick="saveProfileBio()" class="mt-3 px-4 py-2 bg-ifpr-dark hover:bg-ifpr-green text-white text-xs font-semibold rounded-xl shadow-sm transition">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS FOR APP ACTIONS ==================== -->
+    
+    <!-- SUBMIT ASSIGNMENT MODAL (STUDENT) -->
+    <div id="submit-assignment-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 relative">
+            <button onclick="closeModal('submit-assignment-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Enviar Trabalho</h3>
+            <p id="submit-modal-activity-title" class="text-xs text-ifpr-dark font-semibold mb-4">Atividade</p>
+            
+            <form onsubmit="handleAssignmentSubmit(event)" class="space-y-4">
+                <input type="hidden" id="submit-activity-id">
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-ifpr-green transition cursor-pointer bg-slate-50" onclick="document.getElementById('file-upload-input').click()">
+                    <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-slate-400 mb-2"></i>
+                    <p class="text-xs font-semibold text-slate-700">Clique para selecionar o arquivo</p>
+                    <p class="text-[10px] text-slate-400 mt-1">PDF, ZIP, DOCX até 20MB</p>
+                    <input type="file" id="file-upload-input" class="hidden" onchange="updateFileName(this)">
+                </div>
+                <p id="selected-file-name" class="text-xs font-bold text-emerald-600 hidden text-center"></p>
+                <button type="submit" class="w-full py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs shadow-md transition">
+                    Confirmar Envio
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CREATE ACTIVITY MODAL (TEACHER) -->
+    <div id="create-activity-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 relative">
+            <button onclick="closeModal('create-activity-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Criar Nova Atividade</h3>
+            <form onsubmit="handleCreateActivity(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Título da Atividade</label>
+                    <input type="text" id="act-title-input" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Disciplina</label>
+                    <select id="act-discipline-input" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none">
+                        <option value="Algoritmos e Estrutura de Dados">Algoritmos e Estrutura de Dados</option>
+                        <option value="Engenharia de Software I">Engenharia de Software I</option>
+                        <option value="Banco de Dados I">Banco de Dados I</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Data Limite de Entrega</label>
+                    <input type="date" id="act-date-input" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Instruções</label>
+                    <textarea id="act-desc-input" rows="3" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs shadow-md transition">
+                    Publicar Atividade
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NEW FORUM TOPIC MODAL -->
+    <div id="new-topic-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 relative">
+            <button onclick="closeModal('new-topic-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Novo Tópico de Discussão</h3>
+            <form onsubmit="handleCreateForumTopic(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Título da Dúvida/Tópico</label>
+                    <input type="text" id="topic-title-input" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Disciplina Relacionada</label>
+                    <select id="topic-discipline-input" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none">
+                        <option value="Geral / Dúvidas Acadêmicas">Geral / Dúvidas Acadêmicas</option>
+                        <option value="Algoritmos e Estrutura de Dados">Algoritmos e Estrutura de Dados</option>
+                        <option value="Engenharia de Software I">Engenharia de Software I</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Descrição</label>
+                    <textarea id="topic-content-input" rows="4" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-ifpr-green outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-ifpr-dark hover:bg-ifpr-green text-white font-semibold rounded-xl text-xs shadow-md transition">
+                    Criar Tópico
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== APPLICATION STATE & JAVASCRIPT ==================== -->
+    <script>
+        // Global Application State
+        const state = {
+            isLoggedIn: false,
+            user: {
+                name: 'Lucas Silva',
+                email: 'lucas.silva@ifpr.edu.br',
+                role: 'student', // 'student' or 'teacher'
+                code: '2023101899',
+                campus: 'IFPR Campus Assis Chateaubriand',
+                dept: 'TADS - Análise e Desenvolvimento de Sistemas',
+                initials: 'LS'
+            },
+            currentTab: 'dashboard',
+            activities: [
+                {
+                    id: 1,
+                    title: 'Implementação de Árvore B em C++',
+                    discipline: 'Algoritmos e Estrutura de Dados',
+                    dueDate: '2026-10-28',
+                    status: 'Pendente',
+                    grade: null,
+                    feedback: null
+                },
+                {
+                    id: 2,
+                    title: 'Modelagem ER - Sistema de Biblioteca',
+                    discipline: 'Banco de Dados I',
+                    dueDate: '2026-10-24',
+                    status: 'Entregue',
+                    grade: null,
+                    feedback: null
+                },
+                {
+                    id: 3,
+                    title: 'Especificação de Requisitos da Web App',
+                    discipline: 'Engenharia de Software I',
+                    dueDate: '2026-10-18',
+                    status: 'Avaliado',
+                    grade: '9.5',
+                    feedback: 'Excelente detalhamento dos diagramas de casos de uso.'
+                }
+            ],
+            materials: [
+                {
+                    id: 1,
+                    title: 'Apostila de Ponteiros e Alocação Dinâmica',
+                    type: 'apostilas',
+                    format: 'PDF',
+                    size: '2.4 MB',
+                    discipline: 'Algoritmos e Estrutura de Dados',
+                    date: '19 Out 2026'
+                },
+                {
+                    id: 2,
+                    title: 'Slides - Arquitetura de Microsserviços vs Monolito',
+                    type: 'slides',
+                    format: 'PDF',
+                    size: '5.1 MB',
+                    discipline: 'Engenharia de Software I',
+                    date: '17 Out 2026'
+                },
+                {
+                    id: 3,
+                    title: 'Script SQL - Normalização de Dados e Joins',
+                    type: 'exercicios',
+                    format: 'SQL',
+                    size: '45 KB',
+                    discipline: 'Banco de Dados I',
+                    date: '15 Out 2026'
+                }
+            ],
+            forumTopics: [
+                {
+                    id: 1,
+                    title: 'Dúvida sobre balanceamento de Árvores AVL na Lista 3',
+                    author: 'Marianna Costa',
+                    discipline: 'Algoritmos e Estrutura de Dados',
+                    replies: 5,
+                    likes: 12,
+                    pinned: false
+                },
+                {
+                    id: 2,
+                    title: 'Dicas para a prova prática de Socket em Python',
+                    author: 'Prof. Dr. Carlos Eduardo',
+                    discipline: 'Redes de Computadores',
+                    replies: 14,
+                    likes: 28,
+                    pinned: true
+                }
+            ]
+        };
+
+        // Initialize Lucide Icons on load
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderApp();
+        });
+
+        // Toast Helper Function
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-slate-900 border-ifpr-green text-white' : 'bg-red-900 border-red-500 text-white';
+            
+            toast.className = `px-4 py-3 rounded-xl border shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transition duration-300 transform translate-y-2 opacity-0 ${bgColor}`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4 text-emerald-400"></i> ${message}`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Auth Functions
+        function openAuthModal(tab = 'login') {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchAuthTab(tab);
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const regBtn = document.getElementById('tab-register-btn');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                loginBtn.className = "flex-1 pb-3 text-sm font-semibold text-ifpr-dark border-b-2 border-ifpr-dark transition-all";
+                regBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-all";
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                regBtn.className = "flex-1 pb-3 text-sm font-semibold text-ifpr-dark border-b-2 border-ifpr-dark transition-all";
+                loginBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-all";
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            
+            if (!email.includes('@ifpr.edu.br')) {
+                showToast('Utilize um e-mail institucional válido (@ifpr.edu.br)', 'error');
+                return;
+            }
+
+            state.isLoggedIn = true;
+            state.user.name = email.split('@')[0].replace('.', ' ').toUpperCase();
+            state.user.email = email;
+            
+            closeAuthModal();
+            renderApp();
+            showToast('Login realizado com sucesso! Bem-vindo(a).');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value;
+            const role = document.getElementById('reg-role').value;
+
+            if (!email.includes('@ifpr.edu.br')) {
+                showToast('Cadastro permitido apenas para e-mails @ifpr.edu.br', 'error');
+                return;
+            }
+
+            state.isLoggedIn = true;
+            state.user.role = role;
+            state.user.email = email;
+            state.user.name = email.split('@')[0].replace('.', ' ');
+            
+            closeAuthModal();
+            renderApp();
+            showToast('Conta criada com sucesso!');
+        }
+
+        function loginAsDemo(role) {
+            state.isLoggedIn = true;
+            state.user.role = role;
+
+            if (role === 'student') {
+                state.user.name = 'Lucas Silva';
+                state.user.email = 'lucas.silva@ifpr.edu.br';
+                state.user.code = '2023101899';
+                state.user.dept = 'TADS - Análise e Dev. de Sistemas';
+                state.user.initials = 'LS';
+            } else {
+                state.user.name = 'Prof. Dr. Carlos Eduardo';
+                state.user.email = 'carlos.eduardo@ifpr.edu.br';
+                state.user.code = 'SIAPE: 1849201';
+                state.user.dept = 'Departamento de Ciência da Computação';
+                state.user.initials = 'CE';
+            }
+
+            closeAuthModal();
+            renderApp();
+            showToast(`Sessão iniciada como ${role === 'student' ? 'Aluno Demo' : 'Professor Demo'}`);
+        }
+
+        function handleLogout() {
+            state.isLoggedIn = false;
+            renderApp();
+            showToast('Você saiu da plataforma.');
+        }
+
+        function toggleUserRole() {
+            state.user.role = state.user.role === 'student' ? 'teacher' : 'student';
+            if (state.user.role === 'teacher') {
+                state.user.name = 'Prof. Dr. Carlos Eduardo';
+                state.user.initials = 'CE';
+            } else {
+                state.user.name = 'Lucas Silva';
+                state.user.initials = 'LS';
+            }
+            renderApp();
+            showToast(`Modo alterado para Visão do ${state.user.role === 'student' ? 'Aluno' : 'Professor'}`);
+        }
+
+        // App Navigation Function
+        function switchTab(tab) {
+            state.currentTab = tab;
+            
+            const tabs = ['dashboard', 'disciplines', 'library', 'activities', 'forum', 'profile'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`tab-content-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                
+                if (t === tab) {
+                    content.classList.remove('hidden');
+                    navBtn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition bg-ifpr-dark text-white shadow-md";
+                } else {
+                    content.classList.add('hidden');
+                    navBtn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800";
+                }
+            });
+
+            // Re-render contents for active tab
+            if (tab === 'activities') renderActivitiesTab();
+            if (tab === 'library') renderLibraryTab();
+            if (tab === 'forum') renderForumTab();
+            if (tab === 'disciplines') renderDisciplinesTab();
+            
+            lucide.createIcons();
+        }
+
+        // Render App Master Controller
+        function renderApp() {
+            const publicPage = document.getElementById('public-landing-page');
+            const platform = document.getElementById('restricted-platform');
+
+            if (!state.isLoggedIn) {
+                publicPage.classList.remove('hidden');
+                platform.classList.add('hidden');
+            } else {
+                publicPage.classList.add('hidden');
+                platform.classList.remove('hidden');
+
+                // Update Header User Details
+                document.getElementById('user-avatar').textContent = state.user.initials;
+                document.getElementById('profile-avatar-big').textContent = state.user.initials;
+                document.getElementById('user-name-display').textContent = state.user.name;
+                document.getElementById('welcome-user-name').textContent = state.user.name;
+                document.getElementById('user-role-display').textContent = `${state.user.role === 'student' ? 'Aluno' : 'Professor'} • IFPR`;
+                
+                // Update Sidebar Role Button
+                document.getElementById('role-badge-pill').textContent = state.user.role === 'student' ? 'Aluno' : 'Professor';
+                document.getElementById('toggle-role-label').textContent = state.user.role === 'student' ? 'Professor' : 'Aluno';
+
+                // Profile Fields
+                document.getElementById('profile-fullname').textContent = state.user.name;
+                document.getElementById('profile-email').textContent = state.user.email;
+                document.getElementById('profile-code').textContent = state.user.code;
+                document.getElementById('profile-dept').textContent = state.user.dept;
+
+                // Render Dashboard
+                renderDashboard();
+                switchTab(state.currentTab);
+            }
+            lucide.createIcons();
+        }
+
+        // Render Dashboard Content
+        function renderDashboard() {
+            const statsGrid = document.getElementById('dashboard-stats-grid');
+            const activitiesList = document.getElementById('dash-activities-list');
+            const materialsList = document.getElementById('dash-materials-list');
+
+            if (state.user.role === 'student') {
+                document.getElementById('dash-section-title').textContent = 'Próximas Entregas de Trabalhos';
+                
+                statsGrid.innerHTML = `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Disciplinas</p><p class="text-2xl font-extrabold text-slate-900 mt-1">4</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ifpr-dark flex items-center justify-center font-bold"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Pendentes</p><p class="text-2xl font-extrabold text-amber-600 mt-1">1</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Média Geral</p><p class="text-2xl font-extrabold text-ifpr-dark mt-1">9.2</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ifpr-dark flex items-center justify-center font-bold"><i data-lucide="award" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Presença</p><p class="text-2xl font-extrabold text-slate-900 mt-1">98%</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+                    </div>
+                `;
+
+                activitiesList.innerHTML = state.activities.map(act => `
+                    <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">${act.title}</p>
+                            <p class="text-[10px] text-slate-500">${act.discipline} • Prazo: ${act.dueDate}</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${act.status === 'Pendente' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                            ${act.status}
+                        </span>
+                    </div>
+                `).join('');
+
+            } else {
+                document.getElementById('dash-section-title').textContent = 'Entregas de Alunos Pendentes de Correção';
+                
+                statsGrid.innerHTML = `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Turmas Ativas</p><p class="text-2xl font-extrabold text-slate-900 mt-1">3</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ifpr-dark flex items-center justify-center font-bold"><i data-lucide="users" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Para Corrigir</p><p class="text-2xl font-extrabold text-blue-600 mt-1">12</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold"><i data-lucide="file-check" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Total Alunos</p><p class="text-2xl font-extrabold text-slate-900 mt-1">118</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold"><i data-lucide="user" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-slate-500 font-semibold">Materiais Postados</p><p class="text-2xl font-extrabold text-ifpr-dark mt-1">24</p></div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ifpr-dark flex items-center justify-center font-bold"><i data-lucide="folder" class="w-5 h-5"></i></div>
+                    </div>
+                `;
+
+                activitiesList.innerHTML = `
+                    <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">Trabalho Prático - Modelagem ER (8 entregas)</p>
+                            <p class="text-[10px] text-slate-500">Banco de Dados I • Aguardando nota</p>
+                        </div>
+                        <button onclick="switchTab('activities')" class="px-3 py-1 bg-ifpr-dark text-white rounded-lg text-xs font-semibold">Corrigir</button>
+                    </div>
+                `;
+            }
+
+            // Render Recent Materials
+            materialsList.innerHTML = state.materials.slice(0, 2).map(mat => `
+                <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-ifpr-dark flex items-center justify-center font-bold text-xs">${mat.format}</div>
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">${mat.title}</p>
+                            <p class="text-[10px] text-slate-500">${mat.discipline} • ${mat.size}</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadMaterial('${mat.title}')" class="p-2 rounded-lg text-slate-400 hover:text-ifpr-dark hover:bg-slate-200 transition">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Disciplines Tab
+        function renderDisciplinesTab() {
+            const grid = document.getElementById('disciplines-grid');
+            const disciplines = [
+                { name: 'Algoritmos e Estrutura de Dados', code: 'IFPR-ALG101', prof: 'Prof. Dr. Carlos Eduardo', students: 38 },
+                { name: 'Engenharia de Software I', code: 'IFPR-ENG201', prof: 'Profa. Dra. Ana Paula', students: 42 },
+                { name: 'Banco de Dados I', code: 'IFPR-BD102', prof: 'Prof. Me. Roberto Lima', students: 35 },
+                { name: 'Redes de Computadores', code: 'IFPR-RED301', prof: 'Prof. Esp. Marcos Vinicius', students: 32 }
+            ];
+
+            grid.innerHTML = disciplines.map(d => `
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-ifpr-dark">${d.code}</span>
+                        <span class="text-xs text-slate-400 font-medium">${d.students} Alunos</span>
+                    </div>
+                    <h3 class="font-extrabold text-slate-900 text-base mb-1">${d.name}</h3>
+                    <p class="text-xs text-slate-500 mb-6">${d.prof}</p>
+                    <div class="flex gap-2 border-t border-slate-100 pt-4">
+                        <button onclick="switchTab('library')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Materiais</button>
+                        <button onclick="switchTab('activities')" class="flex-1 py-2 bg-ifpr-dark hover:bg-ifpr-green text-white text-xs font-semibold rounded-xl transition">Atividades</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Library Tab
+        function renderLibraryTab() {
+            const uploadBtn = document.getElementById('teacher-upload-btn-container');
+            if (state.user.role === 'teacher') {
+                uploadBtn.classList.remove('hidden');
+            } else {
+                uploadBtn.classList.add('hidden');
+            }
+
+            filterLibrary('all');
+        }
+
+        function filterLibrary(category) {
+            const container = document.getElementById('library-files-container');
+            let filtered = state.materials;
+
+            if (category !== 'all') {
+                filtered = state.materials.filter(m => m.type === category);
+            }
+
+            container.innerHTML = filtered.map(file => `
+                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ifpr-dark flex items-center justify-center font-bold text-xs shrink-0">
+                            ${file.format}
+                        </div>
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">${file.title}</p>
+                            <p class="text-[10px] text-slate-500">${file.discipline} • ${file.size} • Postado em ${file.date}</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadMaterial('${file.title}')" class="px-3 py-1.5 bg-slate-100 hover:bg-ifpr-dark hover:text-white text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Baixar
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function downloadMaterial(title) {
+            showToast(`Download iniciado: ${title}`);
+        }
+
+        // Activities Tab
+        function renderActivitiesTab() {
+            const createBtn = document.getElementById('teacher-create-act-container');
+            const view = document.getElementById('activities-dynamic-view');
+
+            if (state.user.role === 'teacher') {
+                createBtn.classList.remove('hidden');
+                
+                view.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-700 grid grid-cols-12">
+                            <span class="col-span-5">Atividade & Disciplina</span>
+                            <span class="col-span-3">Prazo</span>
+                            <span class="col-span-2">Submissões</span>
+                            <span class="col-span-2 text-right">Ação</span>
+                        </div>
+                        <div class="divide-y divide-slate-100 text-xs">
+                            ${state.activities.map(act => `
+                                <div class="p-4 grid grid-cols-12 items-center">
+                                    <div class="col-span-5">
+                                        <p class="font-bold text-slate-900">${act.title}</p>
+                                        <p class="text-[10px] text-slate-500">${act.discipline}</p>
+                                    </div>
+                                    <span class="col-span-3 text-slate-600">${act.dueDate}</span>
+                                    <span class="col-span-2 font-bold text-emerald-600">28 / 40</span>
+                                    <div class="col-span-2 text-right">
+                                        <button onclick="showToast('Acessando painel de avaliação da turma')" class="px-3 py-1 bg-ifpr-dark text-white rounded-lg font-semibold text-[11px]">Avaliar</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                createBtn.classList.add('hidden');
+
+                view.innerHTML = state.activities.map(act => `
+                    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">${act.discipline}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${act.status === 'Pendente' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                Status: ${act.status}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">${act.title}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Data Limite de Entrega: <span class="font-semibold text-slate-700">${act.dueDate}</span></p>
+                        </div>
+                        ${act.grade ? `
+                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                                <p class="text-xs font-bold text-emerald-900">Nota Atribuída: ${act.grade}/10</p>
+                                <p class="text-[11px] text-emerald-700 mt-0.5">${act.feedback}</p>
+                            </div>
+                        ` : ''}
+                        <div class="pt-2 border-t border-slate-100 flex justify-end">
+                            ${act.status === 'Pendente' ? `
+                                <button onclick="openSubmitModal(${act.id}, '${act.title}')" class="px-4 py-2 bg-ifpr-dark hover:bg-ifpr-green text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Enviar Trabalho
+                                </button>
+                            ` : `
+                                <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                    <i data-lucide="check" class="w-4 h-4"></i> Arquivo Entregue
+                                </span>
+                            `}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        // Forum Tab
+        function renderForumTab() {
+            const container = document.getElementById('forum-topics-container');
+            container.innerHTML = state.forumTopics.map(topic => `
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-ifpr-dark">${topic.discipline}</span>
+                        ${topic.pinned ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Fixado pelo Professor</span>' : ''}
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-base hover:text-ifpr-dark cursor-pointer transition">${topic.title}</h3>
+                    <p class="text-xs text-slate-500">Iniciado por <span class="font-semibold text-slate-700">${topic.author}</span></p>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-4 text-xs text-slate-500">
+                            <button onclick="likeTopic(${topic.id})" class="flex items-center gap-1 hover:text-ifpr-dark font-medium transition">
+                                <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> ${topic.likes}
+                            </button>
+                            <span class="flex items-center gap-1 font-medium">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> ${topic.replies} Respostas
+                            </span>
+                        </div>
+                        <button onclick="showToast('Abrindo tópico de discussão')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">
+                            Ver Discussão
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function likeTopic(topicId) {
+            const topic = state.forumTopics.find(t => t.id === topicId);
+            if (topic) {
+                topic.likes++;
+                renderForumTab();
+                showToast('Curtida registrada!');
+            }
+        }
+
+        // Modals Operations
+        function openSubmitModal(id, title) {
+            document.getElementById('submit-activity-id').value = id;
+            document.getElementById('submit-modal-activity-title').textContent = title;
+            document.getElementById('submit-assignment-modal').classList.remove('hidden');
+        }
+
+        function openCreateActivityModal() {
+            document.getElementById('create-activity-modal').classList.remove('hidden');
+        }
+
+        function openNewTopicModal() {
+            document.getElementById('new-topic-modal').classList.remove('hidden');
+        }
+
+        function openUploadModal() {
+            showToast('Selecione o arquivo para o upload na biblioteca');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function updateFileName(input) {
+            const nameDisplay = document.getElementById('selected-file-name');
+            if (input.files && input.files[0]) {
+                nameDisplay.textContent = `Arquivo selecionado: ${input.files[0].name}`;
+                nameDisplay.classList.remove('hidden');
+            }
+        }
+
+        function handleAssignmentSubmit(e) {
+            e.preventDefault();
+            const actId = parseInt(document.getElementById('submit-activity-id').value);
+            const act = state.activities.find(a => a.id === actId);
+            if (act) {
+                act.status = 'Entregue';
+            }
+            closeModal('submit-assignment-modal');
+            renderActivitiesTab();
+            renderDashboard();
+            showToast('Trabalho enviado com sucesso!');
+        }
+
+        function handleCreateActivity(e) {
+            e.preventDefault();
+            const title = document.getElementById('act-title-input').value;
+            const discipline = document.getElementById('act-discipline-input').value;
+            const dueDate = document.getElementById('act-date-input').value;
+
+            state.activities.unshift({
+                id: Date.now(),
+                title: title,
+                discipline: discipline,
+                dueDate: dueDate,
+                status: 'Pendente',
+                grade: null,
+                feedback: null
+            });
+
+            closeModal('create-activity-modal');
+            renderActivitiesTab();
+            renderDashboard();
+            showToast('Nova atividade cadastrada com sucesso!');
+        }
+
+        function handleCreateForumTopic(e) {
+            e.preventDefault();
+            const title = document.getElementById('topic-title-input').value;
+            const discipline = document.getElementById('topic-discipline-input').value;
+
+            state.forumTopics.unshift({
+                id: Date.now(),
+                title: title,
+                discipline: discipline,
+                author: state.user.name,
+                replies: 0,
+                likes: 0,
+                pinned: false
+            });
+
+            closeModal('new-topic-modal');
+            renderForumTab();
+            showToast('Tópico criado com sucesso!');
+        }
+
+        function saveProfileBio() {
+            showToast('Biografia atualizada com sucesso!');
+        }
+
+        function toggleNotificationsMenu() {
+            const menu = document.getElementById('notif-popup');
+            menu.classList.toggle('hidden');
+        }
+
+        function clearNotifs() {
+            document.getElementById('notif-badge').classList.add('hidden');
+            document.getElementById('notif-popup').classList.add('hidden');
+            showToast('Notificações marcadas como lidas.');
+        }
+    </script>
+</body>
+</html>
