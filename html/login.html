@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EduCore</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <!-- NAVEGAÇÃO -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">📚</span>
+                    <span class="logo-text">EduCore</span>
+                </a>
+                <div class="navbar-buttons">
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1>Bem-vindo ao EduCore</h1>
+            <p class="auth-subtitle">Clique em entrar para visualizar o dashboard de demonstração</p>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email IFPR</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="seu.email@ifpr.edu.br"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        name="senha" 
+                        placeholder="Digite sua senha"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+            </form>
+
+            <div class="auth-divider">
+                <span>Não tem conta?</span>
+            </div>
+
+            <a href="cadastro.html" class="btn btn-secondary btn-full">Criar Conta</a>
+
+            <div class="auth-message" id="message"></div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCore - Plataforma Acadêmica</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <!-- NAVEGAÇÃO -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="logo">
+                    <span class="logo-icon">📚</span>
+                    <span class="logo-text">EduCore</span>
+                </div>
+                <div class="navbar-buttons">
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                    <a href="login.html" class="btn btn-secondary">Entrar</a>
+                    <a href="cadastro.html" class="btn btn-primary">Cadastrar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Sua Plataforma Acadêmica Digital</h1>
+                <p>Centralize materiais, atividades e discussões acadêmicas. Conecte estudantes e professores de forma elegante e eficiente.</p>
+                <div class="hero-buttons">
+                    <a href="cadastro.html" class="btn btn-primary btn-large">Começar Agora</a>
+                    <button class="btn btn-secondary btn-large" onclick="scrollToFeatures()">Saiba Mais</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="placeholder-box">
+                    <div class="placeholder-line"></div>
+                    <div class="placeholder-line short"></div>
+                    <div class="placeholder-lines">
+                        <div class="placeholder-line tiny"></div>
+                        <div class="placeholder-line tiny"></div>
+                        <div class="placeholder-line tiny"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- O QUE É EDUCORE -->
+    <section class="section-light">
+        <div class="container">
+            <h2>O Que é <span class="highlight">EduCore</span>?</h2>
+            <p class="section-subtitle">EduCore é uma plataforma acadêmica integrada que centraliza toda a vida educacional de alunos e professores do IFPR em um único lugar.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-number">👥</div>
+                    <h3>Alunos</h3>
+                    <p>Estudam Melhor</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-number">🎓</div>
+                    <h3>Professores</h3>
+                    <p>Ensinam Melhor</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-number">🏢</div>
+                    <h3>IFPR</h3>
+                    <p>Cresce Melhor</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- POR QUE USAR -->
+    <section class="section-dark">
+        <div class="container">
+            <h2>Por Que <span class="highlight">Usar</span> EduCore?</h2>
+            <p class="section-subtitle">Transforme a forma como você estuda e ensina</p>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">📚</div>
+                    <h3>Tudo Organizado</h3>
+                    <p>Materiais, atividades e discussões em um único lugar</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⏰</div>
+                    <h3>Prazos Claros</h3>
+                    <p>Nunca mais perca uma atividade com notificações automáticas</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💬</div>
+                    <h3>Comunicação Fácil</h3>
+                    <p>Interaja com professores e colegas sem barreiras</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <h3>Acompanhamento</h3>
+                    <p>Veja seu progresso e desempenho em tempo real</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FUNCIONALIDADES -->
+    <section class="section-light" id="features">
+        <div class="container">
+            <h2>Funcionalidades <span class="highlight">Principais</span></h2>
+            <p class="section-subtitle">Tudo que você precisa para uma experiência acadêmica completa</p>
+            
+            <div class="features-grid-large">
+                <div class="feature-box">
+                    <div class="feature-icon">📖</div>
+                    <h3>Biblioteca Digital</h3>
+                    <p>Acesse apostilas, slides, exercícios e resumos organizados por disciplina</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">👥</div>
+                    <h3>Comunidade</h3>
+                    <p>Interaja com colegas e professores através de fóruns de discussão</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Atividades</h3>
+                    <p>Receba, complete e envie atividades com feedback em tempo real</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">📊</div>
+                    <h3>Acompanhamento</h3>
+                    <p>Monitore seu progresso e desempenho nas disciplinas</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">💬</div>
+                    <h3>Comunicação</h3>
+                    <p>Tire dúvidas e receba notificações sobre novidades</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Gerenciamento</h3>
+                    <p>Professores gerenciam materiais, atividades e discussões</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PARA ALUNOS -->
+    <section class="section-dark">
+        <div class="container">
+            <h2>Para <span class="highlight">Alunos</span></h2>
+            <div class="benefits-list">
+                <div class="benefit-item">✓ Acesso centralizado a todos os materiais</div>
+                <div class="benefit-item">✓ Organização por campus, curso e disciplina</div>
+                <div class="benefit-item">✓ Busca avançada para encontrar conteúdos</div>
+                <div class="benefit-item">✓ Participação em fóruns acadêmicos</div>
+                <div class="benefit-item">✓ Notificações sobre atividades e materiais</div>
+                <div class="benefit-item">✓ Acompanhamento de desempenho</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PARA PROFESSORES -->
+    <section class="section-light">
+        <div class="container">
+            <h2>Para <span class="highlight">Professores</span></h2>
+            <div class="benefits-list">
+                <div class="benefit-item">✓ Publicar e gerenciar materiais didáticos</div>
+                <div class="benefit-item">✓ Criar e acompanhar atividades</div>
+                <div class="benefit-item">✓ Moderar fóruns de discussão</div>
+                <div class="benefit-item">✓ Visualizar respostas e dar feedback</div>
+                <div class="benefit-item">✓ Gerar relatórios de desempenho</div>
+                <div class="benefit-item">✓ Economia de tempo em tarefas administrativas</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Pronto para Começar?</h2>
+            <p>Junte-se à comunidade acadêmica do IFPR e transforme sua experiência de aprendizado</p>
+            <div class="cta-buttons">
+                <a href="login.html" class="btn btn-white">Entrar Agora</a>
+                <a href="cadastro.html" class="btn btn-outline-white">Criar Conta</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>EduCore</h3>
+                    <p>Plataforma de estudos e biblioteca acadêmica para os cursos do IFPR</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 IFPR EduCore. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

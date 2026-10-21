@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - EduCore</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+    <!-- NAVEGAÇÃO -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">📚</span>
+                    <span class="logo-text">EduCore</span>
+                </a>
+                <div class="navbar-buttons">
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1>Criar Conta no EduCore</h1>
+            <p class="auth-subtitle">Preencha os dados abaixo para se cadastrar</p>
+
+            <form id="cadastroForm" class="auth-form">
+                <div class="form-group">
+                    <label for="nome">Nome Completo</label>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        name="nome" 
+                        placeholder="Seu nome"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email IFPR</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="seu.email@ifpr.edu.br"
+                        required
+                    >
+                    <small>Use seu email do IFPR (@ifpr.edu.br)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        name="senha" 
+                        placeholder="Crie uma senha"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo">Você é:</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="aluno">Aluno</option>
+                        <option value="professor">Professor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="campus">Campus</label>
+                    <select id="campus" name="campus" required>
+                        <option value="">Selecione seu campus</option>
+                        <option value="curitiba">Curitiba</option>
+                        <option value="londrina">Londrina</option>
+                        <option value="maringa">Maringá</option>
+                        <option value="ponta-grossa">Ponta Grossa</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Criar Conta</button>
+            </form>
+
+            <div class="auth-divider">
+                <span>Já tem conta?</span>
+            </div>
+
+            <a href="login.html" class="btn btn-secondary btn-full">Fazer Login</a>
+
+            <div class="auth-message" id="message"></div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>
